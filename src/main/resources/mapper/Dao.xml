@@ -8,10 +8,13 @@
         JOIN of_sys_user_role USING (user_id)
         JOIN of_sys_role USING (role_id)
         <if test="username != null and username != '' " >
-            WHERE userinfo.`username`= BINARY #{username} LIMIT 1
+            WHERE userinfo.`username`= BINARY #{username}
         </if>
         <if test="phone != null and phone != ''">
-            WHERE userinfo.`phone`= BINARY #{phone} LIMIT 1
+            WHERE userinfo.`phone`= BINARY #{phone}
         </if>
+    </select>
+    <select id="selectname" parameterType="map" resultType="map">
+        select username,phone from userinfo where username=#{username}
     </select>
 </mapper>
