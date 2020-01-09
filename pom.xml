@@ -77,6 +77,17 @@
             <version>2.4</version>
             <classifier>jdk15</classifier>
         </dependency>
+        <!-- 接口文档Swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.2.2</version>
+        </dependency>
         <!-- 短信验证码 -->
         <dependency>
             <groupId>commons-logging</groupId>
@@ -89,12 +100,27 @@
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
         </dependency>
-        <!-- log4j -->
+        <!--添加Springboot默认支持的logback作为标准日志输出-->
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
         </dependency>
+        <!-- 定时任务quartz -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>2.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz-jobs</artifactId>
+            <version>2.2.3</version>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

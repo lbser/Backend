@@ -2,19 +2,16 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="lb.lb.mapper">
+<mapper namespace="com.lb.backend.dao.Dao">
     <select id="lblogin" parameterType="map" resultType="map">
         SELECT * FROM userinfo
-        JOIN of_sys_user_role ON userinfo.`userid`=of_sys_user_role.`user_id`
-        JOIN of_sys_role ON of_sys_user_role.`role_id`=of_sys_role.`role_id`
+        JOIN of_sys_user_role USING (user_id)
+        JOIN of_sys_role USING (role_id)
         <if test="username != null and username != '' " >
-            WHERE userinfo.`username`=#{username} LIMIT 1
+            WHERE userinfo.`username`= BINARY #{username} LIMIT 1
         </if>
         <if test="phone != null and phone != ''">
-            WHERE userinfo.`phone`=#{phone} LIMIT 1
+            WHERE userinfo.`phone`= BINARY #{phone} LIMIT 1
         </if>
     </select>
-    <insert id="" parameterType="map">
-
-    </insert>
 </mapper>

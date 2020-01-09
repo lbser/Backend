@@ -1,7 +1,7 @@
-package com.lb.backend.Service.ServiceImp;
+package com.lb.backend.serviceImp;
 
-import com.lb.backend.Dao.Dao;
-import com.lb.backend.Service.LoginService;
+import com.lb.backend.dao.Dao;
+import com.lb.backend.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +15,7 @@ public class LoginServiceImp implements LoginService {
     Dao dao;
     @Override
     public List<?> lblogin(Map<?, ?> map) {
-        return dao.select("lb.huxing.mapper.lblogin",map);
-    }
-
-    @Override
-    public int insert(Map<?, ?> map) {
-        return 0;
+        System.out.println("loginserviceImp");
+        return dao.lblogin(map);
     }
 }

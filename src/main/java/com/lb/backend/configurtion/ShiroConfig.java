@@ -1,4 +1,4 @@
-package com.lb.backend.Configurtion;
+package com.lb.backend.configurtion;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +20,7 @@ public class ShiroConfig {
     	MyRealm myShiroRealm = new MyRealm();
     	return myShiroRealm;
     }
-    
+
     //权限管理，配置主要是Realm的管理认证
     @Bean
     public SecurityManager securityManager() {

@@ -1,6 +1,6 @@
 package com.lb.backend.shiro;
 
-import com.lb.backend.Service.LoginService;
+import com.lb.backend.service.LoginService;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -11,117 +11,129 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public class MyRealm extends AuthorizingRealm {
-    private static boolean isNumeric(String str){
-        Pattern pattern = Pattern.compile("[0-9]*$");
-        Matcher isNum = pattern.matcher(str);
-        if(!isNum.matches() ){
-            return false;
-        }
-        return true;
-    }
     @Autowired
     LoginService loginService;
-    //登录
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+    //判断传入的值是手机号还是用户名
+    private static boolean isNumeric(String str) {
+        Pattern pattern = Pattern.compile("[0-9]*$");
+        Matcher isNum = pattern.matcher(str);
+        return isNum.matches();
+    }
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-        String principal = (String)principals.getPrimaryPrincipal();
-        boolean tw  = MyRealm.isNumeric(principal);
-        if(tw==true){
-            Map map =  new HashMap();
-            map.put("phone",principal);
-            List<Map> list = (List<Map>) loginService.lblogin(map);
-            Map m = list.get(0);
-            if(m.get("examine").equals(1)){
+        String principal = (String)principalCollection.getPrimaryPrincipal();
+        boolean tl = isNumeric(principal);
+        LinkedHashMap map;
+        List lblogin;
+        Map m;
+        if (tl==true) {
+            map = new LinkedHashMap();
+            map.put("phone", principal);
+            lblogin = loginService.lblogin(map);
+            m = (Map)lblogin.get(0);
+            System.out.println(m);
+            if (m.get("examine").equals(1)) {
                 info.addRole("yh");
-            }else{
+            } else {
                 info.addRole("bu");
             }
-        }else{
-            Map map =  new HashMap();
-            map.put("username",principal);
-            List<Map> list = (List<Map>) loginService.lblogin(map);
-            Map m = list.get(0);
-            if(m.get("examine").equals(1)){
+        } else {
+            map = new LinkedHashMap();
+            map.put("username", principal);
+            lblogin = this.loginService.lblogin(map);
+            m = (Map)lblogin.get(0);
+            System.out.println(m);
+            if (m.get("examine").equals(1)) {
                 info.addRole("yh");
-            }else{
-                info.addRole("te");
+            } else {
+                info.addRole("bu");
             }
         }
         return info;
     }
-    //注册
-    @Override
+
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-        String  tos = (String) token.getCredentials();
-        boolean tl = MyRealm.isNumeric(tos);
-        Map<String,String> map = new HashMap<>();
-        if(tl==true){
-            map.put("phone",tos);
-            List<?> list = loginService.lblogin(map);
-            String pwd = "";
-            String source = "";
-            if(list != null){
-                Map map1 = (Map) list.get(0);
-                pwd = map1.get("saltvalue").toString();
-                source = map1.get("encryption").toString();
-                Map<String,Object> map2 = new HashMap<>();
-                map2.put("saltvalue",pwd);
-                map2.put("encryption",source);
-                String relname = getName();
-                ByteSource bs = new Md5Hash(source);
-                SimpleAuthenticationInfo info  = new SimpleAuthenticationInfo(token.getPrincipal(),pwd,bs,relname);
-                Map map3 = new HashMap();
-                map3.put("phone",token.getPrincipal());
-                if(loginService.lblogin(map3).size()==1){
-                    return info;
-                }
-            }else{
+        String us = (String)token.getPrincipal();
+        boolean tl = isNumeric(us);
+        LinkedHashMap<String, Object> map = new LinkedHashMap();
+        List login;
+        String pwd;
+        String source;
+        Map m;
+        HashMap map2;
+        String relname;
+        Md5Hash bs;
+        SimpleAuthenticationInfo info;
+        HashMap map3;
+        if (tl==true) {
+            map.put("phone", us);
+            System.out.println(map);
+            login = this.loginService.lblogin(map);
+            System.out.println(login);
+            pwd = "";
+            source = "";
+            System.out.println("shi1");
+            if (login == null) {
                 return null;
             }
-        }else {
-            map.put("username", tos);
-            List<?> list = loginService.lblogin(map);
-            String pwd = "";
-            String source = "";
-            if (list != null) {
-                Map map1 = (Map) list.get(0);
-                pwd = map1.get("saltvalue").toString();
-                source = map1.get("encryption").toString();
-                Map<String, Object> map2 = new HashMap<>();
-                map2.put("saltvalue", pwd);
-                map2.put("encryption", source);
-                String relname = getName();
-                ByteSource bs = new Md5Hash(source);
-                SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(token.getPrincipal(), pwd, bs, relname);
-                Map map3 = new HashMap();
-                map3.put("username", token.getPrincipal());
-                if (loginService.lblogin(map3).size() == 1) {
-                    return info;
-                }
-            } else {
+            m = (Map)login.get(0);
+            source = m.get("saltvalue").toString();
+            pwd = m.get("encryption").toString();
+            map2 = new HashMap();
+            map2.put("source", source);
+            map2.put("pwd", pwd);
+            relname = this.getName();
+            bs = new Md5Hash(source);
+            info = new SimpleAuthenticationInfo(token.getPrincipal(), pwd, bs, relname);
+            map3 = new HashMap();
+            map3.put("phone", token.getPrincipal());
+            if (this.loginService.lblogin(map3).size() == 1) {
+
+                return info;
+            }
+        } else {
+            map.put("username", token.getPrincipal());
+            login = this.loginService.lblogin(map);
+            pwd = "";
+            source = "";
+            if (login == null) {
                 return null;
+            }
+            m = (Map)login.get(0);
+            source = m.get("saltvalue").toString();
+            pwd = m.get("encryption").toString();
+            map2 = new HashMap();
+            map2.put("source", source);
+            map2.put("pwd", pwd);
+            relname = this.getName();
+            bs = new Md5Hash(source);
+            info = new SimpleAuthenticationInfo(token.getPrincipal(), pwd, bs, relname);
+            map3 = new HashMap();
+            map3.put("username", token.getPrincipal());
+            if (this.loginService.lblogin(map3).size() == 1) {
+                return info;
             }
         }
         return null;
     }
-    //证书匹配器
     @PostConstruct
     public void setCredentialsMatcher() {
         HashedCredentialsMatcher matcher = new HashedCredentialsMatcher();
         matcher.setHashAlgorithmName("MD5");
         matcher.setHashIterations(1024);
-        setCredentialsMatcher(matcher);
+        this.setCredentialsMatcher(matcher);
     }
 }

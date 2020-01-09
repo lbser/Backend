@@ -6,6 +6,9 @@ import java.util.Map;
 
 import net.sf.json.JSONArray;
 
+/**
+ * 创建用于长字符串
+ */
 public class ChangString {
 
 	/**
@@ -13,7 +16,6 @@ public class ChangString {
 	 * @param obj
 	 * @return
 	 */
-
 	public static String getstring(Object obj) {
 		JSONArray json = JSONArray.fromObject(obj);
 		return json.toString();
